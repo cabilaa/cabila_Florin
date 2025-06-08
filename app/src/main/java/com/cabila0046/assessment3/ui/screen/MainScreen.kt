@@ -80,12 +80,17 @@ fun ListItem(tumbuhan: Tumbuhan) {
         ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(TumbuhanApi.getTumbuhanUrl(tumbuhan.imageId))
+                .data(
+                    if (tumbuhan.nama == "mangga")
+                        TumbuhanApi.getTumbuhanUrl("not-found")
+                    else
+                        TumbuhanApi.getTumbuhanUrl(tumbuhan.imageId))
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.gambar, tumbuhan),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
+            error = painterResource(id = R.drawable.broken_img),
             modifier = Modifier.fillMaxWidth().padding(4.dp)
         )
             Column(
