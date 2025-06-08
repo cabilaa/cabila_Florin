@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cabila0046.assessment3.R
 import com.cabila0046.assessment3.ui.theme.Assessment3Theme
 
@@ -37,8 +38,9 @@ fun MainScreen() {
 }
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier ) {
+    val viewModel: MainViewModel = viewModel()
     Text(
-        text = "Hello Android!",
+        text = "Assessment 3",
         modifier = modifier
     )
 }
