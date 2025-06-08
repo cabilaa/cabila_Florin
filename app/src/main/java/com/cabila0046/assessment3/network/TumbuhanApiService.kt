@@ -9,8 +9,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 
-private const val BASE_URL = "https://raw.githubusercontent.com" +
-        "/indraazimi/mobpro1-compose/static-api/"
+private const val BASE_URL = "https://documenter.getpostman.com/view/21050563/2sB2x3mt7D"
+
 
 private val moshi = Moshi.Builder()
     .add(KotlinJsonAdapterFactory())
@@ -23,7 +23,7 @@ private val retrofit = Retrofit.Builder()
     .build()
 
 interface TumbuhanApiService {
-    @GET("static-api.json")
+    @GET("tumbuhan.php")
     suspend fun getTumbuhan(): List<Tumbuhan>
 }
 object TumbuhanApi {
@@ -31,7 +31,7 @@ object TumbuhanApi {
         retrofit.create(TumbuhanApiService::class.java)
     }
     fun getTumbuhanUrl(imageId: String): String {
-        return "$BASE_URL$imageId.jpg"
+        return "${BASE_URL}image.php?id=$imageId"
     }
 }
 enum class ApiStatus { LOADING, SUCCESS, FAILED }
