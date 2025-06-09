@@ -1,7 +1,5 @@
 package com.cabila0046.assessment3.model
 
-import android.os.Message
-
 
 data class ApiResponse(
     val status: String,
