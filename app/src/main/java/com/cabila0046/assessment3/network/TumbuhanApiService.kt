@@ -1,11 +1,15 @@
 package com.cabila0046.assessment3.network
 
+import com.cabila0046.assessment3.model.ApiResponse
 import com.cabila0046.assessment3.model.Tumbuhan
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Headers
+import retrofit2.http.Query
 
 private const val BASE_URL = "https://plantatious.sendiko.my.id/"
 
@@ -20,16 +24,17 @@ private val retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .build()
 
+
 interface TumbuhanApiService {
     @GET("plants")
-    suspend fun getTumbuhan(): List<Tumbuhan>
+    @Headers("Accept: application/json")
+    suspend fun getTumbuhan(@Query("userId") userId: String): ApiResponse
 }
+
 object TumbuhanApi {
     val service: TumbuhanApiService by lazy {
         retrofit.create(TumbuhanApiService::class.java)
     }
-    fun getTumbuhanUrl(imageId: String): String {
-        return "${BASE_URL}image.log?id=$imageId"
-    }
+
 }
 enum class ApiStatus { LOADING, SUCCESS, FAILED }

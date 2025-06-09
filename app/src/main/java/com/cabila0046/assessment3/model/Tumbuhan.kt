@@ -1,9 +1,19 @@
 package com.cabila0046.assessment3.model
 
+import android.os.Message
+
+
+data class ApiResponse(
+    val status: String,
+    val message: String,
+    val plants: List<Tumbuhan>
+)
+
+
 data class Tumbuhan(
     val name: String,
     val species: String,
-//    val isSelected: Boolean = false,
-    val imageId: String
+    val habitat: String,
+    val imageUrl: String
 
 )

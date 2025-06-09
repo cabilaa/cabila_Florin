@@ -27,7 +27,10 @@ class MainViewModel : ViewModel(){
         viewModelScope.launch(Dispatchers.IO) {
             status.value = ApiStatus.SUCCESS
             try {
-               data.value = TumbuhanApi.service.getTumbuhan()
+//                val result = TumbuhanApi.service.getTumbuhan("null")
+//                        Log.d("MainViewModel", "Success: $result")
+                val response = TumbuhanApi.service.getTumbuhan("null")
+                data.value = response.plants
                 status.value = ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")

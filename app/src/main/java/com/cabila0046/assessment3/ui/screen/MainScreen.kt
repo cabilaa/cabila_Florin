@@ -68,7 +68,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
@@ -171,11 +171,7 @@ fun ListItem(tumbuhan: Tumbuhan) {
         ){
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(
-                    if (tumbuhan.name == "Mawar")
-                        TumbuhanApi.getTumbuhanUrl("not-found")
-                    else
-                        TumbuhanApi.getTumbuhanUrl(tumbuhan.imageId))
+                .data(tumbuhan.imageUrl.replace("http", "https"))
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.gambar, tumbuhan),
@@ -197,17 +193,16 @@ fun ListItem(tumbuhan: Tumbuhan) {
                     fontSize = 14.sp,
                     color = Color.White
                 )
-//                Text(text = if (tumbuhan.isSelected) "Darat" else "Laut",
-//                    fontWeight = if (tumbuhan.isSelected) FontWeight.Bold else FontWeight.Normal,
-//                    fontStyle = FontStyle.Italic,
-//                    fontSize = 14.sp,
-//                    color = if (tumbuhan.isSelected) Color.Green else Color.Cyan
-//                )
+                Text(text = tumbuhan.habitat,
+                    fontStyle = FontStyle.Italic,
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
+
             }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 private suspend fun signIn(context: Context, dataStore: UserDataStore) {
     val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
         .setFilterByAuthorizedAccounts(false)
@@ -240,11 +235,11 @@ private suspend fun handleSignIn(result: GetCredentialResponse, dataStore: UserD
         } catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: ${e.message}")
         }
-    } else {
+    }
+    else {
         Log.e("SIGN-IN", "Error: unrecognized custom credential type.")
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Preview(showBackground = true)
