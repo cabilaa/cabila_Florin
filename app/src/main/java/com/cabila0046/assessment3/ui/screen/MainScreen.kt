@@ -149,7 +149,7 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        ScreenContent(viewModel,user.email, Modifier.padding(innerPadding))
+        ScreenContent(viewModel, user.email, Modifier.padding(innerPadding))
 
         if (showDialog) {
             ProfilDialog(
@@ -176,7 +176,6 @@ fun MainScreen() {
 }
 @Composable
 fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier ) {
-
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 

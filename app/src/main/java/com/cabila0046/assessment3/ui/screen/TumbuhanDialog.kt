@@ -7,9 +7,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -65,6 +68,7 @@ fun TumbuhanDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
+//                    painter = painterResource(id = R.drawable.broken_img),
                     bitmap = bitmap!!.asImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier
@@ -95,7 +99,7 @@ fun TumbuhanDialog(
                 Row(
                     modifier = Modifier
                         .padding(top = 6.dp)
-                        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp)).padding(8.dp)
                 ) {
                     radioOptions.forEach { text ->
                         HabitatOption(
@@ -108,7 +112,7 @@ fun TumbuhanDialog(
                                     role = Role.RadioButton
                                 )
                                 .weight(1f)
-                                .padding(16.dp)
+                                .padding(4.dp)
                         )
                     }
                 }
@@ -141,23 +145,30 @@ fun TumbuhanDialog(
     }
 
 @Composable
-fun HabitatOption(label: String, isSelected: Boolean, modifier: Modifier) {
+fun HabitatOption(
+    label: String,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        modifier = modifier
+            .padding(vertical = 8.dp, horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
         RadioButton(
             selected = isSelected,
-            onClick = { }
+            onClick = null
         )
+        Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 8.dp)
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
         )
-
     }
 }
+
 
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)

@@ -12,6 +12,7 @@ data class Tumbuhan(
     val name: String,
     val species: String,
     val habitat: String,
-    val imageUrl: String
+    val imageUrl: String,
+
 
 )
