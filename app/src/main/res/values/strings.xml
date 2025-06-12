@@ -14,4 +14,9 @@
     <string name="air">Air</string>
     <string name="batal">Batal</string>
     <string name="simpan">Simpan</string>
+    <string name="hapus">Hapus</string>
+    <string name="pesan_hapus">Hapus data ini</string>
+
+
+
 </resources>

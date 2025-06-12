@@ -70,6 +70,18 @@ class MainViewModel : ViewModel(){
         }
     }
 
+    fun deleteData(userId: String, id: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                TumbuhanApi.service.deleteTumbuhan(id)
+                Log.d("MainViewModel", "Data berhasil dihapus dengan ID: $id")
+                retrieveData(userId)
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Gagal menghapus data: ${e.message}")
+            }
+        }
+    }
+
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {
         val stream = ByteArrayOutputStream()
         compress(Bitmap.CompressFormat.JPEG, 80, stream)

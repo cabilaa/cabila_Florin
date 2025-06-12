@@ -9,6 +9,8 @@ data class ApiResponse(
 
 
 data class Tumbuhan(
+    val id: String,
+    val userId: String?,
     val name: String,
     val species: String,
     val habitat: String,
