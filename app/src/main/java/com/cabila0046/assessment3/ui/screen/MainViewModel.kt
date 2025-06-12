@@ -42,18 +42,24 @@ class MainViewModel : ViewModel(){
             }
         }
     }
-    fun saveData(userId: String, name: String, species: String, habitat: String, bitmap: Bitmap) {
+    fun saveData(userId: String?, name: String, species: String, habitat: String, bitmap: Bitmap) {
+        if (userId.isNullOrBlank()) {
+            errorMessage.value = "Anda harus login terlebih dahulu"
+            return
+        }
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val result = TumbuhanApi.service.postTumbuhan(
-                    userId,
+                    userId.toRequestBody("text/plain".toMediaTypeOrNull()),
                     name.toRequestBody("text/plain".toMediaTypeOrNull()),
                     species.toRequestBody("text/plain".toMediaTypeOrNull()),
                     habitat.toRequestBody("text/plain".toMediaTypeOrNull()),
                     bitmap.toMultipartBody()
                 )
-                if (result.status == "success")
+                if (result.status == "201") {
+                    Log.d("MainViewmodel", "Respon status: ${result.message}")
                     retrieveData(userId)
+                }
                 else
                     throw Exception(result.message)
             } catch (e: Exception) {
