@@ -2,9 +2,11 @@ package com.cabila0046.assessment3.ui.screen
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,24 +40,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import coil.compose.rememberAsyncImagePainter
 import com.cabila0046.assessment3.R
 import com.cabila0046.assessment3.ui.theme.Assessment3Theme
 
 @Composable
 fun TumbuhanDialog(
     bitmap: Bitmap?,
+    imageUrl: String? = null,
+    nameInitial: String = "",
+    speciesInitial: String = "",
+    habitatInitial: String = "",
     onDismissRequest: () -> Unit,
     onConfirmation: (String, String, String) -> Unit
 ) {
-    var name by remember { mutableStateOf("") }
-    var species by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(nameInitial) }
+    var species by remember { mutableStateOf(speciesInitial) }
+    var habitat by remember { mutableStateOf(habitatInitial) }
 
 
     val radioOptions = listOf(
         stringResource(id = R.string.darat),
         stringResource(id = R.string.air)
     )
-    var habitat by remember { mutableStateOf("") }
+
 
 
     Dialog(onDismissRequest = { onDismissRequest()}) {
@@ -67,14 +75,28 @@ fun TumbuhanDialog(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
-//                    painter = painterResource(id = R.drawable.broken_img),
-                    bitmap = bitmap!!.asImageBitmap(),
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1f)
-                )
+                ) {
+                    if (bitmap != null) {
+                        Log.d("TokohDialog", "Menampilkan bitmap dari kamera")
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                        )
+                    }
+                    else if (!imageUrl.isNullOrEmpty()) {
+                        Log.d("TokohDialog", "Menampilkan gambar dari url")
+                        Image(
+                            painter = rememberAsyncImagePainter(imageUrl),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxWidth().aspectRatio(1f)
+                        )
+                    }
+                }
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
@@ -99,7 +121,8 @@ fun TumbuhanDialog(
                 Row(
                     modifier = Modifier
                         .padding(top = 6.dp)
-                        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp)).padding(8.dp)
+                        .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
+                        .padding(8.dp)
                 ) {
                     radioOptions.forEach { text ->
                         HabitatOption(
@@ -116,7 +139,6 @@ fun TumbuhanDialog(
                         )
                     }
                 }
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -177,6 +199,9 @@ fun AddDialogPreview() {
     Assessment3Theme {
         TumbuhanDialog (
             bitmap = null,
+            nameInitial = "teratai",
+            speciesInitial = "Genus Nyamphaea",
+            habitatInitial = "Air",
             onDismissRequest = {},
             onConfirmation = {_,_,_->}
         )

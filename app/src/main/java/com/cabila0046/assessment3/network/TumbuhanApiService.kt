@@ -12,6 +12,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -48,6 +49,17 @@ interface TumbuhanApiService {
     suspend fun deleteTumbuhan(
         @Path("id") id: String
     ): Unit
+
+    @Multipart
+    @PUT("plants/{id}")
+    suspend fun updateTumbuhan(
+        @Path("id") id: String,
+        @Part("name") name: RequestBody,
+        @Part("species") species: RequestBody,
+        @Part("habitat") habitat: RequestBody,
+        @Part image: MultipartBody.Part? = null
+    ): Unit
+
 }
 
 object TumbuhanApi {

@@ -13,8 +13,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 
 class MainViewModel : ViewModel(){
@@ -80,6 +83,36 @@ class MainViewModel : ViewModel(){
                 Log.e("MainViewModel", "Gagal menghapus data: ${e.message}")
             }
         }
+    }
+
+    fun updateData(userId: String, id: String, name: String, species: String, habitat: String, bitmap: Bitmap?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val namePart = name.toRequestBody("text/plain".toMediaTypeOrNull())
+                val speciesPart = species.toRequestBody("text/plain".toMediaTypeOrNull())
+                val habitatPart = habitat.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                val image = bitmap?.let {
+                    val file = File.createTempFile("image", ".jpg")
+                    val out = FileOutputStream(file)
+                    it.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                    out.flush()
+                    out.close()
+
+                    val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+                    MultipartBody.Part.createFormData("image", file.name, requestFile)
+                }
+
+                TumbuhanApi.service.updateTumbuhan(id, namePart, speciesPart, habitatPart, image)
+
+                Log.d("MainViewModel", "Data berhasil diupdate untuk ID: $id")
+                retrieveData(userId)
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "Gagal update data: ${e.message}")
+            }
+
+        }
+
     }
 
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {

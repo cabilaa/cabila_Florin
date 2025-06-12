@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -100,6 +101,7 @@ fun MainScreen() {
     var showDialog by remember { mutableStateOf(false)}
     var showTumbuhanDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
     var seletedTumbuhan by remember { mutableStateOf<Tumbuhan?>(null) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
@@ -161,6 +163,10 @@ fun MainScreen() {
             onDelete = { tumbuhan ->
                 seletedTumbuhan = tumbuhan
                 showDeleteDialog = true
+            },
+            onEdit = {tunbuhan ->
+                seletedTumbuhan = tunbuhan
+                showEditDialog = true
             })
 
         if (showDialog) {
@@ -179,6 +185,33 @@ fun MainScreen() {
                 showTumbuhanDialog = false
             }
         }
+
+        if (showEditDialog && seletedTumbuhan != null) {
+            Log.d("EditDialog", "Menampilkan dialog edit tumbuhan: ${seletedTumbuhan!!.name}")
+            Log.d("EditDialog", "imageUlr diterima: ${seletedTumbuhan!!.imageUrl}")
+            Log.d("EditDialog", "species: ${seletedTumbuhan!!.species}, habitat: ${seletedTumbuhan!!.habitat}")
+            TumbuhanDialog(
+                bitmap = null,
+                imageUrl = seletedTumbuhan!!.imageUrl.replace("http", "https"),
+                nameInitial = seletedTumbuhan!!.name,
+                speciesInitial = seletedTumbuhan!!.species,
+                habitatInitial = seletedTumbuhan!!.habitat,
+                onDismissRequest = { showEditDialog = false },
+                        onConfirmation = { name, country, field ->
+                    viewModel.updateData(
+                        userId = user.email,
+                        id = seletedTumbuhan!!.id,
+                        name = name,
+                        species = country,
+                        habitat = field,
+                        null
+                    )
+                    showEditDialog = false
+                        }
+            )
+        }
+
+
         if (showDeleteDialog) {
             DialogHapus(
                 onDismissRequest = { showDeleteDialog = false },
@@ -197,7 +230,7 @@ fun MainScreen() {
     }
 }
 @Composable
-fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier, onDelete: (Tumbuhan) -> Unit ) {
+fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier, onDelete: (Tumbuhan) -> Unit, onEdit: (Tumbuhan) -> Unit ) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
@@ -217,14 +250,17 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 
         ApiStatus.SUCCESS -> {
             LazyVerticalGrid(
-                modifier = modifier.fillMaxSize().padding(4.dp),
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(4.dp),
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(bottom = 80.dp)
             ) {
                 items(data) {tumbuhan ->
                     ListItem(
                         tumbuhan = tumbuhan,
-                        onDelete = { onDelete(tumbuhan) }
+                        onDelete = { onDelete(tumbuhan) },
+                        onEdit = {onEdit(tumbuhan)}
                     )
                 }
                 }
@@ -248,7 +284,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
     }
 }
 @Composable
-fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit) {
+fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit, onEdit: () -> Unit) {
         val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
@@ -258,7 +294,10 @@ fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit) {
 
     val isLoggiedIn = user.email.isNotEmpty()
         Box(
-            modifier = Modifier.padding(4.dp).border(1.dp, Color.Gray).height(200.dp),
+            modifier = Modifier
+                .padding(4.dp)
+                .border(1.dp, Color.Gray)
+                .height(200.dp),
             contentAlignment = Alignment.BottomCenter
         ){
         AsyncImage(
@@ -274,7 +313,9 @@ fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit) {
 
         )
             Column(
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(4.dp)
                     .background(Color(red = 0f, green = 0f, blue = 0f, alpha = 0.5f))
                     .padding(4.dp),
 
@@ -311,6 +352,14 @@ fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit) {
                                 contentDescription = stringResource(id = R.string.hapus),
                                 tint = Color.White
                             )
+                        }
+                        IconButton(onClick = {onEdit()}) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(id = R.string.edit),
+                                tint = Color.White
+                            )
+
                         }
                     }
                 }
