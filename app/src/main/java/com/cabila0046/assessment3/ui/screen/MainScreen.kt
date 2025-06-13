@@ -107,7 +107,11 @@ fun MainScreen() {
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
 
-    val launcher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+    val launcher = rememberLauncherForActivityResult(CropImageContract()) {
+        bitmap = getCroppedImage(context.contentResolver, it)
+        if (bitmap != null) showTumbuhanDialog = true
+    }
+    val launcherEdit = rememberLauncherForActivityResult(CropImageContract()) { result ->
         if (result.isSuccessful) {
             result.uriContent?.let { uri ->
                 selectedBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -173,12 +177,12 @@ fun MainScreen() {
             viewModel,
             user.email,
             Modifier.padding(innerPadding),
-            onDelete = { tumbuhan ->
-                seletedTumbuhan = tumbuhan
+            onDelete = { Tumbuhan ->
+                seletedTumbuhan = Tumbuhan
                 showDeleteDialog = true
             },
-            onEdit = {tunbuhan ->
-                seletedTumbuhan = tunbuhan
+            onEdit = {Tumbuhan ->
+                seletedTumbuhan = Tumbuhan
                 showEditDialog = true
             })
 
@@ -226,7 +230,7 @@ fun MainScreen() {
                             fixAspectRatio = true
                         )
                     )
-                    launcher.launch(option)
+                    launcherEdit.launch(option)
                 },
                 nameInitial = seletedTumbuhan!!.name,
                 speciesInitial = seletedTumbuhan!!.species,
@@ -241,6 +245,7 @@ fun MainScreen() {
                         habitat = habitat,
                         selectedBitmap
                     )
+                            selectedBitmap = null
                     showEditDialog = false }
             )
         }

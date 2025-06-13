@@ -7,8 +7,8 @@
     <string name="tutup">Tutup</string>
     <string name="logout">Logout</string>
     <string name="tambah_tumbuhan">Tambah Tumbuhan</string>
-    <string name="name">nama</string>
-    <string name="species">Jenis</string>
+    <string name="name">Nama</string>
+    <string name="species">Spesies</string>
     <string name="habitat">Habitat:</string>
     <string name="darat">Darat</string>
     <string name="air">Air</string>
