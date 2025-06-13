@@ -102,12 +102,25 @@ fun MainScreen() {
     var showTumbuhanDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var selectedBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var seletedTumbuhan by remember { mutableStateOf<Tumbuhan?>(null) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
-    val launcher = rememberLauncherForActivityResult(CropImageContract()) {
-        bitmap = getCroppedImage(context.contentResolver, it)
-        if (bitmap != null) showTumbuhanDialog = true
+
+    val launcher = rememberLauncherForActivityResult(CropImageContract()) { result ->
+        if (result.isSuccessful) {
+            result.uriContent?.let { uri ->
+                selectedBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    val source = ImageDecoder.createSource(context.contentResolver, uri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    @Suppress("DEPRECATION")
+                    MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+                }
+            }
+        } else {
+            Log.e("CropError", "Crop gagal: ${result.error}")
+        }
     }
 
     Scaffold(
@@ -180,7 +193,19 @@ fun MainScreen() {
         if (showTumbuhanDialog) {
             TumbuhanDialog (
                 bitmap = bitmap,
-                onDismissRequest = { showTumbuhanDialog = false }) {  name, species, habitat ->
+                onDismissRequest = { showTumbuhanDialog = false },
+                onImageEdit = {
+                        val option = CropImageContractOptions(
+                            null, CropImageOptions(
+                                imageSourceIncludeGallery = false,
+                                imageSourceIncludeCamera = true,
+                                fixAspectRatio = true
+                            )
+                        )
+                        launcher.launch(option)
+                }
+
+            ) {  name, species, habitat ->
                 viewModel.saveData(user.email, name, species, habitat, bitmap!!)
                 showTumbuhanDialog = false
             }
@@ -191,23 +216,32 @@ fun MainScreen() {
             Log.d("EditDialog", "imageUlr diterima: ${seletedTumbuhan!!.imageUrl}")
             Log.d("EditDialog", "species: ${seletedTumbuhan!!.species}, habitat: ${seletedTumbuhan!!.habitat}")
             TumbuhanDialog(
-                bitmap = null,
+                bitmap = selectedBitmap,
                 imageUrl = seletedTumbuhan!!.imageUrl.replace("http", "https"),
+                onImageEdit =   {
+                    val option = CropImageContractOptions(
+                        null, CropImageOptions(
+                            imageSourceIncludeGallery = false,
+                            imageSourceIncludeCamera = true,
+                            fixAspectRatio = true
+                        )
+                    )
+                    launcher.launch(option)
+                },
                 nameInitial = seletedTumbuhan!!.name,
                 speciesInitial = seletedTumbuhan!!.species,
                 habitatInitial = seletedTumbuhan!!.habitat,
                 onDismissRequest = { showEditDialog = false },
-                        onConfirmation = { name, country, field ->
+                        onConfirmation = { name, species, habitat ->
                     viewModel.updateData(
                         userId = user.email,
                         id = seletedTumbuhan!!.id,
                         name = name,
-                        species = country,
-                        habitat = field,
-                        null
+                        species = species,
+                        habitat = habitat,
+                        selectedBitmap
                     )
-                    showEditDialog = false
-                        }
+                    showEditDialog = false }
             )
         }
 
@@ -285,14 +319,14 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 }
 @Composable
 fun ListItem(tumbuhan: Tumbuhan, onDelete: () -> Unit, onEdit: () -> Unit) {
-        val context = LocalContext.current
+    val context = LocalContext.current
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
+    val isLoggiedIn = user.email.isNotEmpty()
     val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
     sharedPreferences.edit().putString("userId", tumbuhan.userId).apply()
     val userId = sharedPreferences.getString("userId", "") ?: ""
 
-    val isLoggiedIn = user.email.isNotEmpty()
         Box(
             modifier = Modifier
                 .padding(4.dp)

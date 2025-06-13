@@ -17,7 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -27,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,23 +53,22 @@ import com.cabila0046.assessment3.ui.theme.Assessment3Theme
 fun TumbuhanDialog(
     bitmap: Bitmap?,
     imageUrl: String? = null,
+    onImageEdit: () -> Unit,
     nameInitial: String = "",
     speciesInitial: String = "",
     habitatInitial: String = "",
     onDismissRequest: () -> Unit,
     onConfirmation: (String, String, String) -> Unit
 ) {
-    var name by remember { mutableStateOf(nameInitial) }
-    var species by remember { mutableStateOf(speciesInitial) }
-    var habitat by remember { mutableStateOf(habitatInitial) }
+    var name by rememberSaveable { mutableStateOf(nameInitial) }
+    var species by rememberSaveable { mutableStateOf(speciesInitial) }
+    var habitat by rememberSaveable { mutableStateOf(habitatInitial) }
 
 
     val radioOptions = listOf(
         stringResource(id = R.string.darat),
         stringResource(id = R.string.air)
     )
-
-
 
     Dialog(onDismissRequest = { onDismissRequest()}) {
         Card(
@@ -95,6 +99,13 @@ fun TumbuhanDialog(
                             contentDescription = null,
                             modifier = Modifier.fillMaxWidth().aspectRatio(1f)
                         )
+                    }
+                    IconButton(onClick = onImageEdit) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(id = R.string.update_gambar),
+                                tint = Color.Black
+                            )
                     }
                 }
                 OutlinedTextField(
@@ -199,6 +210,7 @@ fun AddDialogPreview() {
     Assessment3Theme {
         TumbuhanDialog (
             bitmap = null,
+            onImageEdit = {},
             nameInitial = "teratai",
             speciesInitial = "Genus Nyamphaea",
             habitatInitial = "Air",
